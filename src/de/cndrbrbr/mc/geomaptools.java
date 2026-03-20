@@ -275,31 +275,51 @@ public class geomaptools extends JavaPlugin implements Listener, TabCompleter{
 					 int dx = curX - istate.getLastx();
 					 int dz = curZ - istate.getLastz();
 
-					 if (dx != 0 && dz != 0) {
-						 // Diagonal step: insert elbow corner block, then place RAIL at current pos
-						 org.bukkit.World w = from.getWorld();
-						 org.bukkit.Location elbow = new org.bukkit.Location(w, istate.getLastx() + dx, num1 - 2, istate.getLastz());
+					 if (dx == 0 && dz == 0) {
+						 // No block boundary crossed, nothing to place
+					 } else if (dx != 0 && dz != 0) {
+						 // Both axes crossed in one event: insert elbow + RAIL at current
+						 org.bukkit.Location elbow = new org.bukkit.Location(
+							 from.getWorld(), istate.getLastx() + dx, num1 - 2, istate.getLastz());
 						 elbow.getBlock().setType(Material.REDSTONE_BLOCK);
 						 elbow.setY(num1 - 1);
 						 elbow.getBlock().setType(Material.RAIL);
-
 						 from.setY(num1 - 2);
 						 from.getBlock().setType(Material.REDSTONE_BLOCK);
 						 from.setY(num1 - 1);
 						 from.getBlock().setType(Material.RAIL);
-					 } else if (dx != 0 || dz != 0) {
-						 // Straight step: powered rail
+						 istate.setLastDx(dx > 0 ? 1 : -1);
+						 istate.setLastDz(dz > 0 ? 1 : -1);
+					 } else {
+						 // Single-axis step
+						 int newDx = dx != 0 ? (dx > 0 ? 1 : -1) : 0;
+						 int newDz = dz != 0 ? (dz > 0 ? 1 : -1) : 0;
+						 int prevDx = istate.getLastDx();
+						 int prevDz = istate.getLastDz();
+
+						 // Direction changed: was moving on one axis, now the other
+						 boolean turned = (prevDx != 0 && newDx == 0) || (prevDz != 0 && newDz == 0);
+						 if (turned) {
+							 // Retroactively convert the last block from POWERED_RAIL to RAIL (corner)
+							 org.bukkit.Location corner = new org.bukkit.Location(
+								 from.getWorld(), istate.getLastx(), num1 - 1, istate.getLastz());
+							 corner.getBlock().setType(Material.RAIL);
+						 }
 						 from.setY(num1 - 2);
 						 from.getBlock().setType(Material.REDSTONE_BLOCK);
 						 from.setY(num1 - 1);
 						 from.getBlock().setType(Material.POWERED_RAIL);
+						 istate.setLastDx(newDx);
+						 istate.setLastDz(newDz);
 					 }
 				 } else {
-					 // First step: just place powered rail
+					 // First step: powered rail, seed direction
 					 from.setY(num1 - 2);
 					 from.getBlock().setType(Material.REDSTONE_BLOCK);
 					 from.setY(num1 - 1);
 					 from.getBlock().setType(Material.POWERED_RAIL);
+					 istate.setLastDx(0);
+					 istate.setLastDz(0);
 				 }
 			 }
 			 else {

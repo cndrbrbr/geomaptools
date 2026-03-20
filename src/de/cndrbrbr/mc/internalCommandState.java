@@ -79,9 +79,15 @@ public class internalCommandState {
 		private int lasty = 0;
 		private int lastz = 0;
 		private boolean posInitialized = false;
+		private int lastDx = 0;
+		private int lastDz = 0;
 
 		public boolean isPosInitialized() { return posInitialized; }
 		public void setPosInitialized(boolean v) { posInitialized = v; }
+		public int getLastDx() { return lastDx; }
+		public void setLastDx(int v) { lastDx = v; }
+		public int getLastDz() { return lastDz; }
+		public void setLastDz(int v) { lastDz = v; }
 	
 		internalCommandState(Logger alog)
 		{
