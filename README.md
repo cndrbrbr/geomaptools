@@ -1,12 +1,257 @@
 # geomaptools
-Minecraft Bukkit Plugin for Geographic-Map Import, Image Import and quick Building.
-This Plugin is designed to import a geographic map image into the ground of a minecraft 
-map so you can see where to place a wall of a pathway. So you dont have to measure and calculate
-to build a real world place.
-Its also possible to import your own drawn fantasy map of your building or town.
-The import is up to now i Pixel = 1 Block. I will change that!
-Another feature is the import of images into minecraft. You can define a directory from where you can 
-import images into your minecraft world. The images can be in placed on the ground or standing upright.
-For clearing frames of the images i implemented a block delete function thet deletes all blocks of a clicked blocks color.
-Some quickbuild funktions are include too.
-http://minecraft-schule.de/index.php/java/geomaptools-minecraft-plugin/
+
+Minecraft Spigot plugin for geographic map import, image import, and quick building.
+Designed to help you import real-world maps or hand-drawn plans into your Minecraft world as a ground overlay, so you can trace roads, walls, and outlines without measuring manually.
+
+Requires **Spigot 1.21.11** and Java 21.
+
+---
+
+## Installation
+
+1. Copy `geomaptools.jar` into your server's `plugins/` folder.
+2. Start the server — `plugins/geomaptools/config.yml` will be created automatically.
+3. Set the image path in `config.yml`:
+   ```yaml
+   geo:
+     path: /path/to/your/images/
+   ```
+4. Assign permissions (see below).
+
+---
+
+## Permissions
+
+| Permission | Commands |
+|---|---|
+| `geomaptools.basic` | `gspur`, `goff`, `gquad`, `gforward`, `gOSMOverpass`, `gspawnColorSheeps` |
+| `geomaptools.advanced` | `gmap`, `gload`, `glist`, `gdelete`, `gbuildalong` |
+
+---
+
+## Commands
+
+### `/goff`
+Turns off whichever geomaptools command is currently active for you.
+
+```
+/goff
+```
+
+---
+
+### `/gspur [material] [height]`
+Leaves a trail of blocks beneath you as you walk. Every step places a block one level below your feet.
+
+**Parameters:**
+- `material` — block to use (see material list below). Default: `gold`
+- `height` — how many layers high the trail is. Default: `1`
+
+**Example — walk a gold trail:**
+```
+/gspur gold
+```
+
+**Example — walk a raised coal wall, 3 blocks tall:**
+```
+/gspur coal 3
+```
+
+**Special case — `poweredrail`:**
+The trail places a powered rail on top of a redstone block automatically, ready to use with a minecart.
+
+**To stop trailing:** `/goff`
+
+---
+
+### `/gquad [material] [width] [height] [depth]`
+Places a solid rectangular block structure at the next block you place, oriented in the direction you are facing.
+
+**Parameters:**
+- `material` — block material. Default: `gold`
+- `width` — size left/right. Default: `4`
+- `height` — size up/down. Default: `4`
+- `depth` — size forward. Default: `4`
+
+**Example — place a 6×3×1 glass wall in front of you:**
+```
+/gquad glass 6 3 1
+```
+
+Then place any block — the structure appears at that position facing the direction you were looking.
+
+**To cancel:** `/goff`
+
+---
+
+### `/gforward [material] [length] [height]`
+Builds a wall straight ahead of you from the next block you place.
+
+**Parameters:**
+- `material` — block material. Default: `gold`
+- `length` — how far forward the wall extends. Default: `10`
+- `height` — how tall the wall is. Default: `2`
+
+**Example — build a 15-block long, 4-block tall diamond wall:**
+```
+/gforward diamond 15 4
+```
+
+Place a block to trigger it — the wall builds out in the direction you are facing.
+
+**To cancel:** `/goff`
+
+---
+
+### `/gdelete [radius]`
+Removes all connected blocks of the same material as the block you place next, within the given radius. Like a flood-fill delete.
+
+**Parameters:**
+- `radius` — maximum reach from the starting block. Default: `10`
+
+**Example — clear a region of glass blocks within radius 20:**
+```
+/gdelete 20
+```
+
+Hold the same material in your hand, then place a block — all touching blocks of that type within the radius are removed.
+
+**To cancel:** `/goff`
+
+---
+
+### `/gbuildalong [radius] [height]`
+Builds a wall on top of all connected blocks of the same material as the block you place, within the given radius. Useful for raising a wall along an existing outline.
+
+**Parameters:**
+- `radius` — how far the builder searches along the surface. Default: `10`
+- `height` — how many blocks tall to build up. Default: `2`
+
+**Example — raise a 3-block tall wall along all connected gold blocks within radius 15:**
+```
+/gbuildalong 15 3
+```
+
+Place a block on your outline — the walls grow upward along it.
+
+**To cancel:** `/goff`
+
+---
+
+### `/glist`
+Lists all image files (`.PNG`) available in the configured image directory.
+
+```
+/glist
+```
+
+The names shown can be used with `/gmap`.
+
+---
+
+### `/gmap [filename] [ground]`
+Places an image from your image directory into the world as colored wool or terracotta blocks, one pixel per block. Triggered when you place the next block.
+
+**Parameters:**
+- `filename` — name of the image file (e.g. `MyMap.PNG`). Default: `Minion.PNG`
+- `ground` — `true` to lay the image flat on the ground, `false` to place it as a standing wall. Default: `false`
+
+**Example — place an image flat on the ground:**
+```
+/gmap CityPlan.PNG true
+```
+
+**Example — place an image as a standing picture:**
+```
+/gmap Portrait.PNG false
+```
+
+Place a block at the corner where you want the image to start. The image expands from that point.
+
+> **Tip:** Use `/glist` first to see available filenames.
+> **Tip:** Use `/gdelete` to remove an image you no longer need.
+
+**To cancel:** `/goff`
+
+---
+
+### `/gOSMOverpass [size]`
+Imports a real-world map from **OpenStreetMap** (via the Overpass API) centered on the block you are standing on. Roads, paths, and waterways are drawn as block outlines on the ground.
+
+**Parameters:**
+- `size` — area to import in meters (width and depth). Example: `500`
+
+**Example — import a 500m × 500m area:**
+```
+/gOSMOverpass 500
+```
+
+Stand at the block you want to be the center of the map, then run the command. The import may take a few seconds depending on the area size and network speed.
+
+> **Note:** Requires an internet connection. Large areas import many features and may cause a brief lag spike.
+
+---
+
+### `/gspawnColorSheeps [count] [color]`
+Spawns a grid of sheep near you. Useful for testing wool colors or just for fun.
+
+**Parameters:**
+- `count` — total number of sheep to spawn (2–100)
+- `color` — wool color name, or `all` to spawn rainbow `jeb_` sheep. Default: `all`
+
+**Available colors:**
+`WHITE` `ORANGE` `MAGENTA` `LIGHT_BLUE` `YELLOW` `LIME` `PINK` `GRAY` `LIGHT_GRAY` `CYAN` `PURPLE` `BLUE` `BROWN` `GREEN` `RED` `BLACK`
+
+**Example — spawn 16 blue sheep:**
+```
+/gspawnColorSheeps 16 BLUE
+```
+
+**Example — spawn 20 rainbow jeb_ sheep:**
+```
+/gspawnColorSheeps 20 all
+```
+
+---
+
+## Material Names
+
+These names are used as the `material` parameter in `gspur`, `gquad`, `gforward`, etc.:
+
+| Name | Block |
+|---|---|
+| `coal` | Coal Block |
+| `gold` | Gold Block |
+| `diamond` | Diamond Block |
+| `dirt` | Dirt |
+| `fence` | Oak Fence |
+| `glass` | Glass |
+| `sand` | Sand |
+| `grass` | Grass Block |
+| `redstoneblock` | Redstone Block |
+| `glowstone` | Glowstone |
+| `gravel` | Gravel |
+| `poweredrail` | Powered Rail (on Redstone Block) |
+| `potato` | Potato (crop) |
+| `apple` | Apple |
+
+---
+
+## Typical Workflow: Importing a Real-World Map
+
+1. Set your image path in `config.yml`.
+2. Export a map section from OpenStreetMap as an image, or use `/gOSMOverpass` for a live import.
+3. Run `/gmap MyCity.PNG true` and place a block at your starting corner — the map appears as a flat ground overlay.
+4. Walk along the roads and outlines using `/gspur` to trace paths.
+5. Use `/gbuildalong` to raise walls along traced outlines.
+6. Use `/gdelete` to clean up the guide overlay when done.
+
+---
+
+## Building with pom.xml
+
+```bash
+mvn package
+```
+
+The compiled jar is output to `target/geomaptools.jar`. Copy it to your server's `plugins/` folder.
