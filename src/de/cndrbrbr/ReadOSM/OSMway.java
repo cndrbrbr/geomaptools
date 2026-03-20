@@ -70,15 +70,15 @@ public class OSMway {
 	
 	private boolean firstNode = true;
 	private boolean waystarted = false;
+	private MCWCpoint lastNode = null; // persists across calls within the same way
+
 	// draw as they come!
 	// draw single way after reading,
 	// then dispose
 	public void OSMWayAddLine (String line)
 	{
 		List<MCWCpoint> ptList = new ArrayList();
-		
-		MCWCpoint lastNode = null; // lastnode coords
-		
+
 		// ein way gestartet
 		if (line.contains("<way")) { waystarted = true; return;}
 		
@@ -130,6 +130,7 @@ public class OSMway {
 		}
 		if (line.contains("</way>")) {// finished the lines of one way
 			firstNode = true;
+			lastNode = null;
 			tags.clear();
 			ptList.clear();
 			waystarted = false;

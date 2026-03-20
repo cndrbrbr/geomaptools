@@ -422,14 +422,24 @@ public class geomaptools extends JavaPlugin implements Listener, TabCompleter{
 					case "gOSMOverpass":
 					{
 						try {
-							Location startBlock = ((Player) sender).getLocation();
-							double size = (args != null && args.length >= 1) ? Double.parseDouble(args[0]) : 500;
-							double lat  = (args != null && args.length >= 2) ? Double.parseDouble(args[1]) : 50.625;
-							double lon  = (args != null && args.length >= 3) ? Double.parseDouble(args[2]) : 7.041;
+							final Location startBlock = ((Player) sender).getLocation();
+							final double size = (args != null && args.length >= 1) ? Double.parseDouble(args[0]) : 500;
+							final double lat  = (args != null && args.length >= 2) ? Double.parseDouble(args[1]) : 50.625;
+							final double lon  = (args != null && args.length >= 3) ? Double.parseDouble(args[2]) : 7.041;
 							sender.sendMessage("Importing OSM area " + size + "m around " + lat + ", " + lon + " ...");
-							Overpass ov = new Overpass(startBlock, lat, lon, size);
-							ov.importOSMData2World();
-							sender.sendMessage("OSM import done.");
+							final geomaptools plugin = this;
+							final Overpass ov = new Overpass(startBlock, lat, lon, size);
+							Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+								boolean ok = ov.downloadOSMData();
+								Bukkit.getScheduler().runTask(plugin, () -> {
+									if (ok) {
+										int ways = ov.placeBlocksInWorld();
+										player.sendMessage("OSM import done. Ways placed: " + ways);
+									} else {
+										player.sendMessage("OSM download failed. Check server log.");
+									}
+								});
+							});
 						} catch (NumberFormatException e) {
 							sender.sendMessage("Usage: /gOSMOverpass <size> <lat> <lon>");
 						}

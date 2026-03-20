@@ -11,6 +11,7 @@ public class Overpass {
 	private double lat;
 	private double lon;
 	private double sizeMeters;
+	private String tempFile;
 
 	public Overpass(Location ploc, double lat, double lon, double sizeMeters)
 	{
@@ -18,12 +19,13 @@ public class Overpass {
 		this.lat = lat;
 		this.lon = lon;
 		this.sizeMeters = sizeMeters;
+		tempFile = System.getProperty("java.io.tmpdir") + "/geomaptools_osm.xml";
 	}
 
-	public void importOSMData2World()
+	/** Download OSM data from Overpass API to temp file. Call from async thread. */
+	public boolean downloadOSMData()
 	{
 		try {
-			// Calculate bounding box from center lat/lon and size in meters
 			double half = sizeMeters / 2.0;
 			double centerMeterX = SphericalMercator.lon2x(lon);
 			double centerMeterY = SphericalMercator.lat2y(lat);
@@ -33,13 +35,8 @@ public class Overpass {
 			double west  = SphericalMercator.x2lon(centerMeterX - half);
 			double east  = SphericalMercator.x2lon(centerMeterX + half);
 
-			// Set geo reference to the center of the imported area
-			MCWCpoint.setRefLatN(lat);
-			MCWCpoint.setRefLonE(lon);
-			MCWCpoint.setBlockMeterScale(1.0);
+			System.out.println("[geomaptools] Overpass bbox: S=" + south + " N=" + north + " W=" + west + " E=" + east);
 
-			// Download OSM data to a temp file
-			String tempFile = System.getProperty("java.io.tmpdir") + "/geomaptools_osm.xml";
 			ReadOSMData importer = new ReadOSMData();
 			boolean ok = importer.importOSM(
 				String.valueOf(south), String.valueOf(north),
@@ -47,9 +44,24 @@ public class Overpass {
 				tempFile
 			);
 			if (!ok) {
-				System.out.println("[geomaptools] Overpass import failed.");
-				return;
+				System.out.println("[geomaptools] Overpass download failed.");
+				return false;
 			}
+			System.out.println("[geomaptools] Overpass download ok: " + tempFile);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/** Place blocks in the world from previously downloaded data. Call on main thread. */
+	public int placeBlocksInWorld()
+	{
+		try {
+			MCWCpoint.setRefLatN(lat);
+			MCWCpoint.setRefLonE(lon);
+			MCWCpoint.setBlockMeterScale(1.0);
 
 			Map<String, OSMNode> nodes = new HashMap<>();
 
@@ -61,17 +73,31 @@ public class Overpass {
 				if (nod != null) nodes.put(nod.id, nod);
 				line = of.readNextLine();
 			}
+			System.out.println("[geomaptools] Nodes loaded: " + nodes.size());
 
 			// Second pass: draw ways
+			int[] wayCount = {0};
 			OSMway way = new OSMway(nodes, playerpos, lat, lon);
 			line = of.readFirstLine();
 			while (line != null) {
+				if (line.contains("<way")) wayCount[0]++;
 				way.OSMWayAddLine(line);
 				line = of.readNextLine();
 			}
+			System.out.println("[geomaptools] Ways drawn: " + wayCount[0]);
+			return wayCount[0];
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			return -1;
+		}
+	}
+
+	/** Convenience method: download + place, all on the calling thread. */
+	public void importOSMData2World()
+	{
+		if (downloadOSMData()) {
+			placeBlocksInWorld();
 		}
 	}
 }
