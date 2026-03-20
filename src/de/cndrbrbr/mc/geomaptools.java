@@ -422,26 +422,98 @@ public class geomaptools extends JavaPlugin implements Listener, TabCompleter{
 					case "gOSMOverpass":
 					{
 						try {
-							final Location startBlock = ((Player) sender).getLocation();
+							// "reset" subcommand clears the saved map reference
+							if (args != null && args.length >= 1 && args[0].equalsIgnoreCase("reset")) {
+								de.cndrbrbr.ReadOSM.MapReference.delete(getDataFolder());
+								sender.sendMessage("Map reference cleared. Next import starts a new map.");
+								break;
+							}
+
 							final double size = (args != null && args.length >= 1) ? Double.parseDouble(args[0]) : 500;
-							final double lat  = (args != null && args.length >= 2) ? Double.parseDouble(args[1]) : 50.625;
-							final double lon  = (args != null && args.length >= 3) ? Double.parseDouble(args[2]) : 7.041;
-							sender.sendMessage("Importing OSM area " + size + "m around " + lat + ", " + lon + " ...");
+
+							// Load existing map reference (if any)
+							de.cndrbrbr.ReadOSM.MapReference mapRef =
+								de.cndrbrbr.ReadOSM.MapReference.load(getDataFolder());
+
+							final double bboxLat;
+							final double bboxLon;
+							final double refLat;
+							final double refLon;
+							final int    originX;
+							final int    originY;
+							final int    originZ;
+
+							if (mapRef == null) {
+								// First import: lat/lon required
+								if (args == null || args.length < 3) {
+									sender.sendMessage("First import needs coordinates: /gOSMOverpass <size> <lat> <lon>");
+									break;
+								}
+								bboxLat = Double.parseDouble(args[1]);
+								bboxLon = Double.parseDouble(args[2]);
+								refLat  = bboxLat;
+								refLon  = bboxLon;
+								originX = player.getLocation().getBlockX();
+								originY = player.getLocation().getBlockY();
+								originZ = player.getLocation().getBlockZ();
+
+								// Save the anchor for future imports
+								mapRef = new de.cndrbrbr.ReadOSM.MapReference();
+								mapRef.refLat  = refLat;
+								mapRef.refLon  = refLon;
+								mapRef.originX = originX;
+								mapRef.originY = originY;
+								mapRef.originZ = originZ;
+								mapRef.save(getDataFolder());
+								sender.sendMessage(String.format(
+									"Map reference set: (%.6f, %.6f) = world (%d, %d). Use /gOSMOverpass <size> for more tiles.",
+									refLat, refLon, originX, originZ));
+							} else {
+								// Subsequent import: use saved reference
+								refLat  = mapRef.refLat;
+								refLon  = mapRef.refLon;
+								originX = mapRef.originX;
+								originY = mapRef.originY;
+								originZ = mapRef.originZ;
+
+								if (args != null && args.length >= 3) {
+									// Explicit geo center provided
+									bboxLat = Double.parseDouble(args[1]);
+									bboxLon = Double.parseDouble(args[2]);
+								} else {
+									// Auto: calculate where the player stands in geo space
+									double[] geo = mapRef.worldToGeo(
+										player.getLocation().getBlockX(),
+										player.getLocation().getBlockZ());
+									bboxLat = geo[0];
+									bboxLon = geo[1];
+									sender.sendMessage(String.format(
+										"Player geo position: %.6f, %.6f", bboxLat, bboxLon));
+								}
+							}
+
+							sender.sendMessage(String.format(
+								"Downloading OSM %.0fm around (%.6f, %.6f)...", size, bboxLat, bboxLon));
+
 							final geomaptools plugin = this;
-							final Overpass ov = new Overpass(startBlock, lat, lon, size);
+							final de.cndrbrbr.ReadOSM.Overpass ov = new de.cndrbrbr.ReadOSM.Overpass(
+								player.getWorld(), bboxLat, bboxLon, size,
+								refLat, refLon, originX, originY, originZ);
+
 							Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 								boolean ok = ov.downloadOSMData();
 								Bukkit.getScheduler().runTask(plugin, () -> {
 									if (ok) {
 										int ways = ov.placeBlocksInWorld();
-										player.sendMessage("OSM import done. Ways placed: " + ways);
+										player.sendMessage("OSM import done. Ways: " + ways);
 									} else {
 										player.sendMessage("OSM download failed. Check server log.");
 									}
 								});
 							});
+
 						} catch (NumberFormatException e) {
-							sender.sendMessage("Usage: /gOSMOverpass <size> <lat> <lon>");
+							sender.sendMessage("Usage: /gOSMOverpass <size> [lat lon]  or  /gOSMOverpass reset");
 						}
 					}break;
 				
