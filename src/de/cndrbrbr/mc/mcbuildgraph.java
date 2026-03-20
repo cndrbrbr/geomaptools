@@ -8,8 +8,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.material.Wool;
 
 public class mcbuildgraph {
 	
@@ -59,15 +57,11 @@ public class mcbuildgraph {
 	 public void SetColAndMat (Material mat,DyeColor theColor, Location loc)
 	 {
 		 Block b = loc.getBlock();
-		 b.setType(mat);
-		 if (mat == Material.WOOL) {
-			 
-	        BlockState bs = loc.getBlock().getState();
-	        Wool wool = (Wool) bs.getData();
-	        wool.setColor(theColor);
-	        bs.update();
+		 if (theColor != null) {
+			 b.setType(mappingTables.DyeColorToWool(theColor));
+		 } else {
+			 b.setType(mat);
 		 }
-
 	 }
 	 
 	public void setBlockColMat (World world, double x, double y, double z, Material mat,DyeColor theColor)
@@ -76,13 +70,9 @@ public class mcbuildgraph {
 		 SetColAndMat ( mat, theColor,  loc);
 	}
 	
-	public DyeColor GetColor (Block b) 
+	public DyeColor GetColor (Block b)
 	{
-		if (b.getType() == Material.WOOL) {
-			DyeColor col = ((Wool) b.getState().getData()).getColor();		
-			return col;
-		}
-		else return null;
+		return mappingTables.WoolToDyeColor(b.getType());
 	}
 		
 	 public boolean IsSameMaterialAndColor (Location loc,Material mat, DyeColor theColor)

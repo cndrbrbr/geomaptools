@@ -36,8 +36,9 @@ public class createMap {
 					Material mat;
 					DyeColor dcol;
 					if (ifwool == true) {
-						dcol = mappingTables.MatCol2WoolCol (col);
-						mat  = Material.WOOL; 
+						dcol = mappingTables.MatCol2WoolCol(col);
+						mat  = mappingTables.DyeColorToWool(dcol);
+						dcol = null;
 					}
 					else {
 						mat = mappingTables.MatCol2Mat (col);

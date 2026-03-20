@@ -25,10 +25,10 @@ public class mappingTables {
 			case "gold":  mat =  Material.GOLD_BLOCK; break;
 			case "diamond":  mat =  Material.DIAMOND_BLOCK; break;
 			case "dirt":  mat =  Material.DIRT; break;
-			case "fence":  mat =  Material.FENCE; break;
+			case "fence":  mat =  Material.OAK_FENCE; break;
 			case "glass":  mat =  Material.GLASS; break;
 			case "sand":  mat =  Material.SAND; break;
-			case "grass":  mat =  Material.GRASS; break;
+			case "grass":  mat =  Material.GRASS_BLOCK; break;
 			case "redstoneblock":  mat =  Material.REDSTONE_BLOCK; break;
 			case "glowstone":  mat =  Material.GLOWSTONE; break;
 			case "gravel":  mat =  Material.GRAVEL; break;
@@ -199,7 +199,7 @@ public class mappingTables {
 		if (string.equalsIgnoreCase("LIME")) return DyeColor.LIME;
 		if (string.equalsIgnoreCase("PINK")) return DyeColor.PINK;
 		if (string.equalsIgnoreCase("GRAY")) return DyeColor.GRAY;
-		if (string.equalsIgnoreCase("SILVER")) return DyeColor.SILVER;
+		if (string.equalsIgnoreCase("SILVER")) return DyeColor.LIGHT_GRAY;
 		if (string.equalsIgnoreCase("CYAN")) return DyeColor.CYAN;
 		if (string.equalsIgnoreCase("PURPLE")) return DyeColor.PURPLE;
 		if (string.equalsIgnoreCase("BROWN")) return DyeColor.BROWN;
@@ -212,8 +212,52 @@ public class mappingTables {
 
 	}
 	
-	//WHITE ORANGE MAGENTA LIGHT_BLUE YELLOW LIME PINK GRAY SILVER CYAN PURPLE BLUE BROWN GREEN RED BLACK
-	
+	//WHITE ORANGE MAGENTA LIGHT_BLUE YELLOW LIME PINK GRAY LIGHT_GRAY CYAN PURPLE BLUE BROWN GREEN RED BLACK
+
+	static public Material DyeColorToWool(DyeColor color) {
+		if (color == null) return Material.WHITE_WOOL;
+		switch (color) {
+			case WHITE:      return Material.WHITE_WOOL;
+			case ORANGE:     return Material.ORANGE_WOOL;
+			case MAGENTA:    return Material.MAGENTA_WOOL;
+			case LIGHT_BLUE: return Material.LIGHT_BLUE_WOOL;
+			case YELLOW:     return Material.YELLOW_WOOL;
+			case LIME:       return Material.LIME_WOOL;
+			case PINK:       return Material.PINK_WOOL;
+			case GRAY:       return Material.GRAY_WOOL;
+			case LIGHT_GRAY: return Material.LIGHT_GRAY_WOOL;
+			case CYAN:       return Material.CYAN_WOOL;
+			case PURPLE:     return Material.PURPLE_WOOL;
+			case BLUE:       return Material.BLUE_WOOL;
+			case BROWN:      return Material.BROWN_WOOL;
+			case GREEN:      return Material.GREEN_WOOL;
+			case RED:        return Material.RED_WOOL;
+			case BLACK:      return Material.BLACK_WOOL;
+			default:         return Material.WHITE_WOOL;
+		}
+	}
+
+	static public DyeColor WoolToDyeColor(Material mat) {
+		switch (mat) {
+			case WHITE_WOOL:      return DyeColor.WHITE;
+			case ORANGE_WOOL:     return DyeColor.ORANGE;
+			case MAGENTA_WOOL:    return DyeColor.MAGENTA;
+			case LIGHT_BLUE_WOOL: return DyeColor.LIGHT_BLUE;
+			case YELLOW_WOOL:     return DyeColor.YELLOW;
+			case LIME_WOOL:       return DyeColor.LIME;
+			case PINK_WOOL:       return DyeColor.PINK;
+			case GRAY_WOOL:       return DyeColor.GRAY;
+			case LIGHT_GRAY_WOOL: return DyeColor.LIGHT_GRAY;
+			case CYAN_WOOL:       return DyeColor.CYAN;
+			case PURPLE_WOOL:     return DyeColor.PURPLE;
+			case BLUE_WOOL:       return DyeColor.BLUE;
+			case BROWN_WOOL:      return DyeColor.BROWN;
+			case GREEN_WOOL:      return DyeColor.GREEN;
+			case RED_WOOL:        return DyeColor.RED;
+			case BLACK_WOOL:      return DyeColor.BLACK;
+			default:              return null;
+		}
+	}
 
 
 	static public DyeColor MatCol2WoolCol (String name)
@@ -281,8 +325,8 @@ public class mappingTables {
 			case "DarkSlateGray":  	
 			case "DarkGray":  		col =  DyeColor.GRAY ; break;
 //---------------------------------------------------------------
-			case "Silver": 			
-			case "LightGray":  		col =  DyeColor.SILVER ; break;
+			case "Silver":
+			case "LightGray":  		col =  DyeColor.LIGHT_GRAY ; break;
 //---------------------------------------------------------------
 			
 			case "Green":  			

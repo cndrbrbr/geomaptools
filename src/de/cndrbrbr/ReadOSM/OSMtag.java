@@ -1,8 +1,5 @@
 package de.cndrbrbr.ReadOSM;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 
 //<tag k="bicycle" v="yes"/>
 

@@ -2,7 +2,8 @@
     main: de.cndrbrbr.mc.geomaptools
     author: cndrbrbr
     description: because it is possible
-    version: 4.34
+    version: 4.35
+    api-version: '1.21'
     commands:
         gspur:
             description: Mache eine Spur aus Material. [material = coal,gold,diamond,dirt,fence,glass,sand,grass,redstoneblock,glowstone,gravel,poweredrail,potato,apple]

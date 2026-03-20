@@ -32,8 +32,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.Colorable;
-import org.bukkit.material.Wool;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
@@ -119,11 +117,7 @@ public class geomaptools extends JavaPlugin implements Listener{
 			
 			// Die Farbe des geclickten Blockes holen 
 			mat =  clickedblock.getType();
-			DyeColor theColor;// = col.getColor();
-			if (mat == Material.WOOL) {
-				theColor = ((Wool) clickedblock.getState().getData()).getColor();
-			}
-			else theColor = null;
+			DyeColor theColor = mappingTables.WoolToDyeColor(mat);
 			this.getLogger().info(mat + " " + theColor);  
 				 
 			  
@@ -261,11 +255,9 @@ public class geomaptools extends JavaPlugin implements Listener{
 			 DyeColor theColor = null;
 			 ItemStack items = event.getPlayer().getInventory().getItemInMainHand();
 			 
-			 if (items != null) {	 
-				 mat = items.getType();			 
-				 if (mat == Material.WOOL) {
-					 theColor= ((Wool)items.getData()).getColor();
-				 }
+			 if (items != null) {
+				 mat = items.getType();
+				 theColor = mappingTables.WoolToDyeColor(mat);
 			 }
 			 else {
 				 mat = state.GetMaterial(playername);
