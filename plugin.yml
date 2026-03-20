@@ -32,7 +32,7 @@ commands:
         permission-message: You don't have <permission>
     gOSMOverpass:
         description: Import a real-world map from OpenStreetMap at your location
-        usage: /<command> [size in meters]
+        usage: /<command> <size> <lat> <lon>
         permission: geomaptools.basic
         permission-message: You don't have <permission>
     gspawnColorSheeps:

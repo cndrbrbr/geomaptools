@@ -34,14 +34,13 @@ public class OSMway {
 	private  Map<String, String> tags = new HashMap();
 	
 	
-	public OSMway(Map<String, OSMNode> nodes2, Location playerpos2) {
-	
+	public OSMway(Map<String, OSMNode> nodes2, Location playerpos2, double refLat, double refLon) {
+
 		nodes = nodes2;
-		MCWCpoint.setBlockMeterScale(1/1.5);
-		MCWCpoint.setRefLatN(50.622972); //Koordinaten Campus 
-		MCWCpoint.setRefLonE(7.040316);
+		MCWCpoint.setRefLatN(refLat);
+		MCWCpoint.setRefLonE(refLon);
 		playerPos = playerpos2;
-		
+
 	}
 
 	// <nd ref="456356412"/>

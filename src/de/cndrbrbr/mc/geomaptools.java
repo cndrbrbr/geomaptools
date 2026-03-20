@@ -266,13 +266,15 @@ public class geomaptools extends JavaPlugin implements Listener, TabCompleter{
 
 			 double num1 = event.getFrom().getY();
 			 
-			 if (state.IsMaterielRedstone(playername)) 
+			 if (state.IsMaterielRedstone(playername))
 			 {
-				 from.setY(from.getY() -2);
+				 int dx = from.getBlockX() - (istate != null ? istate.getLastx() : from.getBlockX());
+				 int dz = from.getBlockZ() - (istate != null ? istate.getLastz() : from.getBlockZ());
+				 boolean isCorner = (dx != 0) && (dz != 0);
+				 from.setY(from.getY() - 2);
 				 from.getBlock().setType(Material.REDSTONE_BLOCK);
-				 from.setY(num1-1);
-				 from.getBlock().setType(Material.POWERED_RAIL);
-				 
+				 from.setY(num1 - 1);
+				 from.getBlock().setType(isCorner ? Material.RAIL : Material.POWERED_RAIL);
 			 }
 			 else {
 				 from.setY(from.getY() -1);
@@ -371,13 +373,19 @@ public class geomaptools extends JavaPlugin implements Listener, TabCompleter{
 					} break;
 					
 					case "gOSMOverpass":
-	
 					{
-						Location startBlock = ((Player) sender).getLocation();
-						Overpass ov = new Overpass(startBlock);
-						ov.importOSMData2World();
-						
-					
+						try {
+							Location startBlock = ((Player) sender).getLocation();
+							double size = (args != null && args.length >= 1) ? Double.parseDouble(args[0]) : 500;
+							double lat  = (args != null && args.length >= 2) ? Double.parseDouble(args[1]) : 50.625;
+							double lon  = (args != null && args.length >= 3) ? Double.parseDouble(args[2]) : 7.041;
+							sender.sendMessage("Importing OSM area " + size + "m around " + lat + ", " + lon + " ...");
+							Overpass ov = new Overpass(startBlock, lat, lon, size);
+							ov.importOSMData2World();
+							sender.sendMessage("OSM import done.");
+						} catch (NumberFormatException e) {
+							sender.sendMessage("Usage: /gOSMOverpass <size> <lat> <lon>");
+						}
 					}break;
 				
 				}// switch					
@@ -534,8 +542,11 @@ public class geomaptools extends JavaPlugin implements Listener, TabCompleter{
 				player.sendMessage(GRAY + "Use /glist to see available files.");
 				break;
 			case "gosmoverpass":
-				player.sendMessage(GOLD + "/gOSMOverpass [size in meters]");
-				player.sendMessage(WHITE + "Imports a real-world OpenStreetMap area centered on you.");
+				player.sendMessage(GOLD + "/gOSMOverpass <size> <lat> <lon>");
+				player.sendMessage(WHITE + "Downloads an OpenStreetMap area and places it in the world.");
+				player.sendMessage(WHITE + "The map is centered on the given geo coordinate.");
+				player.sendMessage(WHITE + "Your standing position becomes the origin (0,0) of the map.");
+				player.sendMessage(GRAY + "Example: /gOSMOverpass 500 48.8566 2.3522  (Paris, 500m)");
 				break;
 			case "gspawncolorsheeps":
 				player.sendMessage(GOLD + "/gspawnColorSheeps [count] [color|all]");
