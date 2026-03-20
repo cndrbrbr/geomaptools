@@ -21,6 +21,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -41,7 +42,7 @@ import de.cndrbrbr.ReadOSM.*;
 
 // https://yivesmirror.com/downloads/craftbukkit
 
-public class geomaptools extends JavaPlugin implements Listener{
+public class geomaptools extends JavaPlugin implements Listener, TabCompleter{
 	
 	playersList state = null;
 	Logger log = null;
@@ -430,6 +431,67 @@ public class geomaptools extends JavaPlugin implements Listener{
         }
     }
 
+
+
+
+	private static final List<String> MATERIALS = java.util.Arrays.asList(
+		"coal","gold","diamond","dirt","fence","glass","sand","grass",
+		"redstoneblock","glowstone","gravel","poweredrail","potato","apple"
+	);
+
+	private static final List<String> COLORS = java.util.Arrays.asList(
+		"WHITE","ORANGE","MAGENTA","LIGHT_BLUE","YELLOW","LIME","PINK",
+		"GRAY","LIGHT_GRAY","CYAN","PURPLE","BLUE","BROWN","GREEN","RED","BLACK","all"
+	);
+
+	private static final List<String> COMMANDS = java.util.Arrays.asList(
+		"gspur","goff","gquad","gforward","gmap","glist","gdelete",
+		"gbuildalong","gOSMOverpass","gspawnColorSheeps","ghelp"
+	);
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
+		List<String> completions = new ArrayList<>();
+		String partial = args.length > 0 ? args[args.length - 1].toLowerCase() : "";
+
+		switch (cmd.getName().toLowerCase()) {
+			case "gspur":
+				if (args.length == 1) completions.addAll(MATERIALS);
+				break;
+			case "gquad":
+			case "gforward":
+				if (args.length == 1) completions.addAll(MATERIALS);
+				break;
+			case "gspawncolorsheeps":
+				if (args.length == 2) completions.addAll(COLORS);
+				break;
+			case "gmap":
+				if (args.length == 1) {
+					if (pathtomaps != null) {
+						File folder = new File(pathtomaps);
+						if (folder.exists() && folder.isDirectory()) {
+							for (File f : folder.listFiles()) {
+								if (f.isFile() && f.getName().toLowerCase().endsWith(".png"))
+									completions.add(f.getName());
+							}
+						}
+					}
+				} else if (args.length == 2) {
+					completions.add("true");
+					completions.add("false");
+				}
+				break;
+			case "ghelp":
+				if (args.length == 1) completions.addAll(COMMANDS);
+				break;
+		}
+
+		List<String> filtered = new ArrayList<>();
+		for (String s : completions) {
+			if (s.toLowerCase().startsWith(partial)) filtered.add(s);
+		}
+		return filtered;
+	}
 
 
 	private void printHelp(Player player, String topic) {
