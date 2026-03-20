@@ -5,6 +5,9 @@ import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
 
 /*
  * 	<way id="38549389">
@@ -12,6 +15,7 @@ import org.bukkit.Material;
 	<nd ref="456356396"/>
 	...
 	<tag k="highway" v="service"/>
+	<tag k="name" v="Hauptstraße"/>
 	</way>
 */
 
@@ -20,7 +24,6 @@ public class OSMway {
 	private Map<String, OSMNode> nodes;
 	private Map<String, String> tags = new HashMap<>();
 
-	// Player's world position is used as the map origin (block 0,0)
 	private final int originX;
 	private final int originY;
 	private final int originZ;
@@ -36,7 +39,6 @@ public class OSMway {
 		originZ = playerpos2.getBlockZ();
 	}
 
-	// <nd ref="456356412"/>
 	private String GetNodeid(String iline) {
 		String line = StringUtls.washstring(iline);
 		try {
@@ -57,6 +59,11 @@ public class OSMway {
 	private boolean waystarted = false;
 	private MCWCpoint lastNode = null;
 
+	// World position of the first node of the current way — used for sign placement
+	private int signX = 0;
+	private int signZ = 0;
+	private boolean hasSignPos = false;
+
 	public void OSMWayAddLine(String line) {
 
 		if (line.contains("<way")) { waystarted = true; return; }
@@ -72,6 +79,9 @@ public class OSMway {
 				if (firstNode) {
 					firstNode = false;
 					lastNode = pt;
+					signX = originX + (int) Math.round(pt.getBlockX());
+					signZ = originZ + (int) Math.round(pt.getBlockZ());
+					hasSignPos = true;
 					placeBlock(pt);
 				} else {
 					DrawLine(lastNode, pt);
@@ -80,20 +90,28 @@ public class OSMway {
 			}
 		}
 
-		if (line.contains("</way>")) {
-			firstNode = true;
-			lastNode = null;
-			tags.clear();
-			waystarted = false;
-		}
-
 		if (waystarted && line.contains("<tag")) {
 			OSMtag tag = new OSMtag(line);
 			tags.put(tag.k, tag.v);
 		}
+
+		if (line.contains("</way>")) {
+			// Place sign at first node if the way has a name
+			if (hasSignPos) {
+				String name = tags.get("name");
+				if (name != null && !name.isEmpty()) {
+					placeSign(signX, signZ, name);
+				}
+			}
+			// Reset for next way
+			firstNode = true;
+			lastNode = null;
+			hasSignPos = false;
+			tags.clear();
+			waystarted = false;
+		}
 	}
 
-	/** Place a single glowstone block at the given MCWCpoint offset from player origin. */
 	private void placeBlock(MCWCpoint pt) {
 		int wx = originX + (int) Math.round(pt.getBlockX());
 		int wz = originZ + (int) Math.round(pt.getBlockZ());
@@ -104,10 +122,52 @@ public class OSMway {
 	}
 
 	/**
-	 * Standard Bresenham line from p1 to p2.
-	 * Block coordinates are offsets from the player origin.
-	 * Safety limit prevents any infinite loop.
+	 * Place an oak sign on top of the glowstone at (wx, originY, wz).
+	 * The way name is split across sign lines (15 chars each).
 	 */
+	private void placeSign(int wx, int wz, String name) {
+		try {
+			Block signBlock = playerPos.getWorld().getBlockAt(wx, originY + 1, wz);
+			signBlock.setType(Material.OAK_SIGN);
+			Block base = playerPos.getWorld().getBlockAt(wx, originY, wz);
+			if (base.getType() != Material.GLOWSTONE) {
+				base.setType(Material.GLOWSTONE);
+			}
+			if (signBlock.getState() instanceof Sign) {
+				Sign sign = (Sign) signBlock.getState();
+				// Split name into lines of max 15 chars
+				String[] lines = splitIntoLines(name, 15, 4);
+				for (int i = 0; i < lines.length; i++) {
+					sign.getSide(Side.FRONT).setLine(i, lines[i]);
+				}
+				sign.update(true);
+			}
+		} catch (Exception e) {
+			System.out.println("[geomaptools] Sign error at (" + wx + "," + wz + "): " + e);
+		}
+	}
+
+	/** Split a string into lines of maxLen, up to maxLines. */
+	private static String[] splitIntoLines(String text, int maxLen, int maxLines) {
+		String[] result = new String[maxLines];
+		int pos = 0;
+		for (int i = 0; i < maxLines; i++) {
+			if (pos >= text.length()) {
+				result[i] = "";
+			} else {
+				int end = Math.min(pos + maxLen, text.length());
+				// Try to break at a space
+				if (end < text.length() && text.charAt(end) != ' ') {
+					int space = text.lastIndexOf(' ', end);
+					if (space > pos) end = space;
+				}
+				result[i] = text.substring(pos, end).trim();
+				pos = end;
+			}
+		}
+		return result;
+	}
+
 	public void DrawLine(MCWCpoint p1, MCWCpoint p2) {
 		if (p1 == null || p2 == null) return;
 
@@ -123,7 +183,7 @@ public class OSMway {
 		int err = adx - adz;
 
 		int x = x1, z = z1;
-		int limit = adx + adz + 2; // max steps is manhattan distance + slack
+		int limit = adx + adz + 2;
 
 		for (int step = 0; step <= limit; step++) {
 			playerPos.setX(originX + x);
@@ -139,7 +199,6 @@ public class OSMway {
 		}
 	}
 
-	// Keep old signature for any remaining internal callers
 	public void DrawLine(MCWCpoint p1, MCWCpoint p2, Location loc) {
 		DrawLine(p1, p2);
 	}
