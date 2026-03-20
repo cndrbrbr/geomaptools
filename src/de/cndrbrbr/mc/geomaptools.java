@@ -265,16 +265,42 @@ public class geomaptools extends JavaPlugin implements Listener, TabCompleter{
 			 }
 
 			 double num1 = event.getFrom().getY();
-			 
+
 			 if (state.IsMaterielRedstone(playername))
 			 {
-				 int dx = from.getBlockX() - (istate != null ? istate.getLastx() : from.getBlockX());
-				 int dz = from.getBlockZ() - (istate != null ? istate.getLastz() : from.getBlockZ());
-				 boolean isCorner = (dx != 0) && (dz != 0);
-				 from.setY(from.getY() - 2);
-				 from.getBlock().setType(Material.REDSTONE_BLOCK);
-				 from.setY(num1 - 1);
-				 from.getBlock().setType(isCorner ? Material.RAIL : Material.POWERED_RAIL);
+				 int curX = from.getBlockX();
+				 int curZ = from.getBlockZ();
+
+				 if (istate != null && istate.isPosInitialized()) {
+					 int dx = curX - istate.getLastx();
+					 int dz = curZ - istate.getLastz();
+
+					 if (dx != 0 && dz != 0) {
+						 // Diagonal step: insert elbow corner block, then place RAIL at current pos
+						 org.bukkit.World w = from.getWorld();
+						 org.bukkit.Location elbow = new org.bukkit.Location(w, istate.getLastx() + dx, num1 - 2, istate.getLastz());
+						 elbow.getBlock().setType(Material.REDSTONE_BLOCK);
+						 elbow.setY(num1 - 1);
+						 elbow.getBlock().setType(Material.RAIL);
+
+						 from.setY(num1 - 2);
+						 from.getBlock().setType(Material.REDSTONE_BLOCK);
+						 from.setY(num1 - 1);
+						 from.getBlock().setType(Material.RAIL);
+					 } else if (dx != 0 || dz != 0) {
+						 // Straight step: powered rail
+						 from.setY(num1 - 2);
+						 from.getBlock().setType(Material.REDSTONE_BLOCK);
+						 from.setY(num1 - 1);
+						 from.getBlock().setType(Material.POWERED_RAIL);
+					 }
+				 } else {
+					 // First step: just place powered rail
+					 from.setY(num1 - 2);
+					 from.getBlock().setType(Material.REDSTONE_BLOCK);
+					 from.setY(num1 - 1);
+					 from.getBlock().setType(Material.POWERED_RAIL);
+				 }
 			 }
 			 else {
 				 from.setY(from.getY() -1);
@@ -283,10 +309,11 @@ public class geomaptools extends JavaPlugin implements Listener, TabCompleter{
 			 }
 		 }
 		 if (istate != null) {
-			 istate.setLastx(from.getBlockX());
-			 istate.setLasty(from.getBlockY());
-			 istate.setLastz(from.getBlockZ());
-			 
+			 // use event.getFrom() directly so Y mutation from rail placement does not affect X/Z
+			 istate.setLastx(event.getFrom().getBlockX());
+			 istate.setLasty(event.getFrom().getBlockY());
+			 istate.setLastz(event.getFrom().getBlockZ());
+			 istate.setPosInitialized(true);
 		 }
 	 }
 	 
