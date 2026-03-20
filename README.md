@@ -175,20 +175,27 @@ Place a block at the corner where you want the image to start. The image expands
 
 ---
 
-### `/gOSMOverpass [size]`
-Imports a real-world map from **OpenStreetMap** (via the Overpass API) centered on the block you are standing on. Roads, paths, and waterways are drawn as block outlines on the ground.
+### `/gOSMOverpass <size> <lat> <lon>`
+Imports a real-world map from **OpenStreetMap** (via the Overpass API) and draws it as glowstone blocks in the world. Roads and paths are drawn relative to your current position.
 
 **Parameters:**
-- `size` — area to import in meters (width and depth). Example: `500`
+- `size` — area to import in meters (width and depth). Recommended: `500`–`2000`
+- `lat` — latitude of the center of the area (decimal degrees)
+- `lon` — longitude of the center of the area (decimal degrees)
 
-**Example — import a 500m × 500m area:**
+**Example — import 1000m around Paris:**
 ```
-/gOSMOverpass 500
+/gOSMOverpass 1000 48.8566 2.3522
 ```
 
-Stand at the block you want to be the center of the map, then run the command. The import may take a few seconds depending on the area size and network speed.
+**Example — import 500m around Bonn, Germany:**
+```
+/gOSMOverpass 500 50.735 7.101
+```
 
-> **Note:** Requires an internet connection. Large areas import many features and may cause a brief lag spike.
+Stand at the point you want to be the map origin, then run the command. The download runs in the background — you will receive a chat message when the import is done and how many ways were placed.
+
+> **Note:** Requires an internet connection. Use at least `500` for size — smaller areas may have no roads and produce an empty result.
 
 ---
 
