@@ -69,6 +69,6 @@ public class playersList {
 	boolean IsMaterielRedstone(String player)
 	{
 		Material mat = GetMaterial (player);
-		return (mat.equals(Material.REDSTONE_BLOCK));		
+		return (mat.equals(Material.POWERED_RAIL));
 	}
 }
