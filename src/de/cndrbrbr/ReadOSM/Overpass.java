@@ -116,7 +116,8 @@ public class Overpass {
 			System.out.println("[geomaptools] Ways drawn: " + wayCount[0]);
 			return wayCount[0];
 
-		} catch (Exception e) {
+		} catch (Throwable e) {
+			System.out.println("[geomaptools] placeBlocksInWorld error: " + e);
 			e.printStackTrace();
 			return -1;
 		}

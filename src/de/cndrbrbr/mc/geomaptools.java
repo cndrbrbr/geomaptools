@@ -504,8 +504,13 @@ public class geomaptools extends JavaPlugin implements Listener, TabCompleter{
 								boolean ok = ov.downloadOSMData();
 								Bukkit.getScheduler().runTask(plugin, () -> {
 									if (ok) {
-										int ways = ov.placeBlocksInWorld();
-										player.sendMessage("OSM import done. Ways: " + ways);
+										try {
+											int ways = ov.placeBlocksInWorld();
+											player.sendMessage("OSM import done. Ways: " + ways);
+										} catch (Throwable t) {
+											player.sendMessage("OSM placement error: " + t.getMessage());
+											t.printStackTrace();
+										}
 									} else {
 										player.sendMessage("OSM download failed. Check server log.");
 									}

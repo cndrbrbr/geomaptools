@@ -7,7 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.block.sign.Side;
 
 /*
  * 	<way id="38549389">
@@ -135,12 +134,11 @@ public class OSMway {
 			}
 			if (signBlock.getState() instanceof Sign) {
 				Sign sign = (Sign) signBlock.getState();
-				// Split name into lines of max 15 chars
 				String[] lines = splitIntoLines(name, 15, 4);
 				for (int i = 0; i < lines.length; i++) {
-					sign.getSide(Side.FRONT).setLine(i, lines[i]);
+					sign.setLine(i, lines[i]);
 				}
-				sign.update(true);
+				sign.update();
 			}
 		} catch (Exception e) {
 			System.out.println("[geomaptools] Sign error at (" + wx + "," + wz + "): " + e);
