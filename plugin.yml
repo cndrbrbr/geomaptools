@@ -1,64 +1,67 @@
-    name: geomaptools
-    main: de.cndrbrbr.mc.geomaptools
-    author: cndrbrbr
-    description: because it is possible
-    version: 4.35
-    api-version: '1.21'
-    commands:
-        gspur:
-            description: Mache eine Spur aus Material. [material = coal,gold,diamond,dirt,fence,glass,sand,grass,redstoneblock,glowstone,gravel,poweredrail,potato,apple]
-            usage: /<command> [material=gold]  Dicke der Spur(hoehe=1)  material = coal,gold,diamond,dirt,fence,glass,sand,grass,redstoneblock,glowstone,gravel,poweredrail,potato,apple
-            permission: geomaptools.basic
-            permission-message: You don't have <permission>
-        goff:
-            description: geoTools off for <player>
-            usage: /<command> 
-            permission: geomaptools.basic
-            permission-message: You don't have <permission>
-        gquad:
-            description: Mache 4 Bloecke. [material = coal,gold,diamond,dirt,fence,glass,sand,grass,redstoneblock,glowstone,gravel,poweredrail,potato,apple]
-            usage: /<command> [material] breite hoehe tiefe  material = coal,gold,diamond,dirt,fence,glass,sand,grass,redstoneblock,glowstone,gravel,poweredrail,potato,apple]
-            permission: geomaptools.basic
-            permission-message: You don't have <permission>
-        gforward:
-            description: Setzt eine <hoehe> Block hohe Mauer <laenge> geradeaus.
-            usage: /<command> [laenge der Mauer] [hoehe der Mauer]
-            permission: geomaptools.basic
-            permission-message: You don't have <permission>
-        gmap:
-            description: Setzt eine Karte ein.
-            usage: /<command> rechtsclick
-            permission: geomaptools.advanced
-            permission-message: You don't have <permission>
-        gload:
-            description: laedt ein bild.
-            usage: /<command> 
-            permission: geomaptools.advanced
-            permission-message: You don't have <permission>
-        glist:
-            description: Listet alle Bilder namen.
-            usage: /<command> 
-            permission: geomaptools.advanced
-            permission-message: You don't have <permission>       
-        gdelete:
-            description: loescht alle angrenzenden Bloecke, die dasselbe Material haben, wie der selektierte. In der Hand muss das Material auch sein.
-            usage: /<command> radius 
-            permission: geomaptools.advanced
-            permission-message: You don't have <permission>
-        gOSMOverpass:
-            description: Importiert die Karte von Open Street Map
-            usage: /<command> breite und tiefe in Meter ab dem selektierten Block
-            permission: geomaptools.basic
-            permission-message: You don't have <permission>
-        gbuildalong:
-            description: baut mit dem geclickten material des geclickten blocks eine wand mit hoehe h im radius r
-            usage: /<command> radius hoehe 
-            permission: geomaptools.advanced
-            permission-message: You don't have <permission>
-        gspawnColorSheeps:
-            description: Spawnt bunte Schafe, wenn keine Farbean gegeben, bunte Schafe jeb_
-            usage: /<command> Anzahl Farbe (WHITE ORANGE MAGENTA LIGHT_BLUE YELLOW LIME PINK GRAY SILVER CYAN PURPLE BLUE BROWN GREEN RED BLACK)
-            permission: geomaptools.basic
-            permission-message: You don't have <permission>
-    
-    
+name: geomaptools
+main: de.cndrbrbr.mc.geomaptools
+author: cndrbrbr
+description: Geographic map import, image import, and quick building tools
+version: 4.36
+api-version: '1.21'
+commands:
+    ghelp:
+        description: Show help for all geomaptools commands
+        usage: /<command> [command]
+        permission: geomaptools.basic
+        permission-message: You don't have <permission>
+    goff:
+        description: Turn off the active geomaptools command
+        usage: /<command>
+        permission: geomaptools.basic
+        permission-message: You don't have <permission>
+    gspur:
+        description: Leave a trail of blocks beneath you as you walk
+        usage: /<command> [material] [height]
+        permission: geomaptools.basic
+        permission-message: You don't have <permission>
+    gquad:
+        description: Place a rectangular block structure in the direction you face
+        usage: /<command> [material] [width] [height] [depth]
+        permission: geomaptools.basic
+        permission-message: You don't have <permission>
+    gforward:
+        description: Build a wall straight ahead from the next block you place
+        usage: /<command> [material] [length] [height]
+        permission: geomaptools.basic
+        permission-message: You don't have <permission>
+    gOSMOverpass:
+        description: Import a real-world map from OpenStreetMap at your location
+        usage: /<command> [size in meters]
+        permission: geomaptools.basic
+        permission-message: You don't have <permission>
+    gspawnColorSheeps:
+        description: Spawn colored sheep at your location
+        usage: /<command> [count] [color|all]
+        permission: geomaptools.basic
+        permission-message: You don't have <permission>
+    gmap:
+        description: Place an image as blocks at the next block you place
+        usage: /<command> [filename.PNG] [ground:true|false]
+        permission: geomaptools.advanced
+        permission-message: You don't have <permission>
+    glist:
+        description: List all available image files
+        usage: /<command>
+        permission: geomaptools.advanced
+        permission-message: You don't have <permission>
+    gload:
+        description: Load an image from URL
+        usage: /<command>
+        permission: geomaptools.advanced
+        permission-message: You don't have <permission>
+    gdelete:
+        description: Delete all connected blocks of the same material within radius
+        usage: /<command> [radius]
+        permission: geomaptools.advanced
+        permission-message: You don't have <permission>
+    gbuildalong:
+        description: Build walls on top of all connected blocks of the same material
+        usage: /<command> [radius] [height]
+        permission: geomaptools.advanced
+        permission-message: You don't have <permission>

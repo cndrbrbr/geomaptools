@@ -306,10 +306,15 @@ public class geomaptools extends JavaPlugin implements Listener{
 				
 				String cmdname = cmd.getName();
 				switch (cmdname)  {
-					case "goff":				
+					case "ghelp":
+					{
+						String topic = (args != null && args.length > 0) ? args[0] : "";
+						printHelp(player, topic);
+					} break;
+
+					case "goff":
 					{
 						state.CommandOff(playername);
-						
 					} break;
 					case "glist":				
 					{
@@ -319,18 +324,30 @@ public class geomaptools extends JavaPlugin implements Listener{
 						
 					} break;
 									
-					case "gspur":	
-					case "gquad":	
+					case "gspur":
+					case "gquad":
 					case "gmap":
 					case "gdelete":
-					case "gbuildalong":				
+					case "gbuildalong":
 					case "gforward":
-					case "gspawnColorSheeps":
 					{
 						String result = state.CommandOn(cmd.getName(),args,playername);
 						sender.sendMessage(result);
 						this.getLogger().info("Activted "+ cmd.getName() + " for " + playername + " " +result);
-	
+
+					} break;
+
+					case "gspawnColorSheeps":
+					{
+						state.CommandOn(cmd.getName(),args,playername);
+						internalCommandState istate = state.GetState(playername);
+						if (istate != null) {
+							SpawnCreatures sp = new SpawnCreatures();
+							sp.SpawnColorSheeps(player.getLocation(), istate.getNumber(), istate.getColorname());
+							this.getLogger().info("gspawnColorSheeps spawned " + istate.getNumber() + " " + istate.getColorname());
+						}
+						state.CommandOff(playername);
+						sender.sendMessage("Spawned sheeps!");
 					} break;
 					
 					case "gload":
@@ -413,6 +430,74 @@ public class geomaptools extends JavaPlugin implements Listener{
         }
     }
 
+
+
+	private void printHelp(Player player, String topic) {
+		String GOLD = ChatColor.GOLD.toString();
+		String AQUA = ChatColor.AQUA.toString();
+		String WHITE = ChatColor.WHITE.toString();
+		String GRAY = ChatColor.GRAY.toString();
+
+		switch (topic.toLowerCase()) {
+			case "gspur":
+				player.sendMessage(GOLD + "/gspur [material] [height]");
+				player.sendMessage(WHITE + "Leaves a trail of blocks beneath you as you walk.");
+				player.sendMessage(GRAY + "Then use /goff to stop.");
+				player.sendMessage(GRAY + "Materials: coal gold diamond dirt fence glass sand grass");
+				player.sendMessage(GRAY + "  redstoneblock glowstone gravel poweredrail potato apple");
+				break;
+			case "gquad":
+				player.sendMessage(GOLD + "/gquad [material] [width] [height] [depth]");
+				player.sendMessage(WHITE + "Places a solid block structure at the next block you place,");
+				player.sendMessage(WHITE + "oriented in the direction you face.");
+				break;
+			case "gforward":
+				player.sendMessage(GOLD + "/gforward [material] [length] [height]");
+				player.sendMessage(WHITE + "Builds a wall straight ahead from the next block you place.");
+				break;
+			case "gdelete":
+				player.sendMessage(GOLD + "/gdelete [radius]");
+				player.sendMessage(WHITE + "Removes all connected blocks of the same material within radius.");
+				player.sendMessage(WHITE + "Trigger by placing a block. Default radius: 10.");
+				break;
+			case "gbuildalong":
+				player.sendMessage(GOLD + "/gbuildalong [radius] [height]");
+				player.sendMessage(WHITE + "Builds walls on top of connected same-material blocks.");
+				player.sendMessage(WHITE + "Trigger by placing a block. Defaults: radius=10 height=2.");
+				break;
+			case "gmap":
+				player.sendMessage(GOLD + "/gmap [filename.PNG] [ground:true|false]");
+				player.sendMessage(WHITE + "Places an image as blocks at the next block you place.");
+				player.sendMessage(WHITE + "ground=true: flat on floor. ground=false: standing wall.");
+				player.sendMessage(GRAY + "Use /glist to see available files.");
+				break;
+			case "gosmoverpass":
+				player.sendMessage(GOLD + "/gOSMOverpass [size in meters]");
+				player.sendMessage(WHITE + "Imports a real-world OpenStreetMap area centered on you.");
+				break;
+			case "gspawncolorsheeps":
+				player.sendMessage(GOLD + "/gspawnColorSheeps [count] [color|all]");
+				player.sendMessage(WHITE + "Spawns colored sheep at your location. Count: 2-100.");
+				player.sendMessage(GRAY + "Colors: WHITE ORANGE MAGENTA LIGHT_BLUE YELLOW LIME PINK");
+				player.sendMessage(GRAY + "  GRAY LIGHT_GRAY CYAN PURPLE BLUE BROWN GREEN RED BLACK");
+				player.sendMessage(GRAY + "Use \"all\" for rainbow jeb_ sheep.");
+				break;
+			default:
+				player.sendMessage(GOLD + "--- geomaptools commands ---");
+				player.sendMessage(AQUA + "/goff" + WHITE + " - stop the active command");
+				player.sendMessage(AQUA + "/gspur" + WHITE + " [material] [height] - walk a trail");
+				player.sendMessage(AQUA + "/gquad" + WHITE + " [material] [w] [h] [d] - place a box");
+				player.sendMessage(AQUA + "/gforward" + WHITE + " [material] [length] [height] - build a wall forward");
+				player.sendMessage(AQUA + "/gdelete" + WHITE + " [radius] - flood-fill delete blocks");
+				player.sendMessage(AQUA + "/gbuildalong" + WHITE + " [radius] [height] - raise walls along outline");
+				player.sendMessage(AQUA + "/gmap" + WHITE + " [file] [ground] - place image as blocks");
+				player.sendMessage(AQUA + "/glist" + WHITE + " - list available images");
+				player.sendMessage(AQUA + "/gOSMOverpass" + WHITE + " [meters] - import OSM map");
+				player.sendMessage(AQUA + "/gspawnColorSheeps" + WHITE + " [count] [color] - spawn sheep");
+				player.sendMessage(GRAY + "Type /ghelp <command> for details on any command.");
+				break;
+		}
+	}
 
 
 }
