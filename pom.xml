@@ -6,7 +6,7 @@
 
     <groupId>de.cndrbrbr.mc</groupId>
     <artifactId>geomaptools</artifactId>
-    <version>4.35</version>
+    <version>4.36</version>
     <packaging>jar</packaging>
 
     <properties>
