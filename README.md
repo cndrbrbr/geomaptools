@@ -1,4 +1,8 @@
-# geomaptools
+<p align="center">
+  <img src="logo.svg" width="128" height="128" alt="geomaptools logo">
+</p>
+
+<h1 align="center">geomaptools</h1>
 
 Minecraft Spigot plugin for geographic map import, image import, and quick building.
 Designed to help you import real-world maps or hand-drawn plans into your Minecraft world as a ground overlay, so you can trace roads, walls, and outlines without measuring manually.
