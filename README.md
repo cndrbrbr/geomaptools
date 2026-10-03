@@ -5,7 +5,23 @@
 <h1 align="center">geomaptools</h1>
 
 Minecraft Spigot plugin for geographic map import, image import, and quick building.
-Designed to help you import real-world maps or hand-drawn plans into your Minecraft world as a ground overlay, so you can trace roads, walls, and outlines without measuring manually.
+
+## Overview
+
+geomaptools brings the real world — or your own plans — into Minecraft. It lays a map
+on the ground as a guide, so you can rebuild your town, your school or a whole city
+quarter to scale without measuring anything by hand.
+
+- **Real-world maps** — `/gOSMOverpass` downloads roads and paths from OpenStreetMap
+  around any latitude/longitude and draws them as glowstone lines around you.
+- **Images and plans** — `/gmap` turns a PNG (a city plan, a floor plan, a pixel
+  picture) into colored blocks, flat on the ground or as a standing wall.
+- **Quick building** — trace the map with trails (`/gspur`), raise walls along an
+  outline (`/gbuildalong`), build blocks and walls in one step (`/gquad`, `/gforward`)
+  and clean up again with a flood-fill delete (`/gdelete`).
+
+A typical workflow: import the map, trace the outlines you want, raise them into walls,
+then remove the guide lines — see [Typical Workflow](#typical-workflow-importing-a-real-world-map).
 
 Runs on **Spigot 1.21.11** (Java 21) and **Spigot 26.3** (Java 25).
 
