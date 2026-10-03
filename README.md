@@ -3,13 +3,15 @@
 Minecraft Spigot plugin for geographic map import, image import, and quick building.
 Designed to help you import real-world maps or hand-drawn plans into your Minecraft world as a ground overlay, so you can trace roads, walls, and outlines without measuring manually.
 
-Requires **Spigot 1.21.11** and Java 21.
+Runs on **Spigot 1.21.11** (Java 21) and **Spigot 26.3** (Java 25).
 
 ---
 
 ## Installation
 
-1. Copy `geomaptools.jar` into your server's `plugins/` folder.
+1. Download the jar for your server from the [Releases](https://github.com/cndrbrbr/geomaptools/releases) page —
+   each Minecraft version has its own release (`v<version>-mc1.21.11` or `v<version>-mc26.3`) —
+   and copy it into your server's `plugins/` folder.
 2. Start the server — `plugins/geomaptools/config.yml` will be created automatically.
 3. Set the image path in `config.yml`:
    ```yaml
@@ -258,7 +260,11 @@ These names are used as the `material` parameter in `gspur`, `gquad`, `gforward`
 ## Building with pom.xml
 
 ```bash
-mvn package
+mvn package               # Spigot 1.21.11 → target/geomaptools-<version>-mc1.21.11.jar
+mvn package -P mc-26.3    # Spigot 26.3    → target/geomaptools-<version>-mc26.3.jar
 ```
 
-The compiled jar is output to `target/geomaptools.jar`. Copy it to your server's `plugins/` folder.
+Copy the jar to your server's `plugins/` folder. Building the `mc-26.3` profile needs JDK 25+.
+
+CI builds both jars on every push. A tag `v<version>-mc<minecraft>` (e.g. `v4.37-mc26.3`)
+publishes a separate GitHub Release containing only the jar for that Minecraft version.

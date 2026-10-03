@@ -2,8 +2,8 @@ name: geomaptools
 main: de.cndrbrbr.mc.geomaptools
 author: cndrbrbr
 description: Geographic map import, image import, and quick building tools
-version: 4.36
-api-version: '1.21'
+version: '${project.version}'
+api-version: '${plugin.api-version}'
 commands:
     ghelp:
         description: Show help for all geomaptools commands

@@ -6,29 +6,57 @@
 
     <groupId>de.cndrbrbr.mc</groupId>
     <artifactId>geomaptools</artifactId>
-    <version>4.36</version>
+    <version>4.37</version>
     <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Default target: Minecraft/Spigot 1.21.11. Override with profile mc-26.3 -->
+        <spigot.version>1.21.11-R0.2-SNAPSHOT</spigot.version>
+        <plugin.api-version>1.21</plugin.api-version>
+        <mc.classifier>mc1.21.11</mc.classifier>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>spigot-snapshots</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+
+    <profiles>
+        <!-- Minecraft/Spigot 26.3. Building needs JDK 25+ to read the API
+             classfiles; our own bytecode still targets Java 21. -->
+        <profile>
+            <id>mc-26.3</id>
+            <properties>
+                <spigot.version>26.3-R0.1-SNAPSHOT</spigot.version>
+                <plugin.api-version>26.3</plugin.api-version>
+                <mc.classifier>mc26.3</mc.classifier>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.21.11-R0.2-SNAPSHOT</version>
+            <version>${spigot.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}-${project.version}-${mc.classifier}</finalName>
         <sourceDirectory>src</sourceDirectory>
         <resources>
             <resource>
                 <directory>${project.basedir}</directory>
+                <!-- fills in version and api-version in plugin.yml -->
+                <filtering>true</filtering>
                 <includes>
                     <include>plugin.yml</include>
                     <include>config.yml</include>
@@ -56,7 +84,6 @@
                             <mainClass>de.cndrbrbr.mc.geomaptools</mainClass>
                         </manifest>
                     </archive>
-                    <finalName>geomaptools</finalName>
                 </configuration>
             </plugin>
         </plugins>
